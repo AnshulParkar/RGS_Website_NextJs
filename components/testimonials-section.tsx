@@ -48,7 +48,6 @@ const testimonials =
       text: "The glass partitions installed by RoopGlass gave our restaurant a modern, open, and welcoming atmosphere. Our customers love the new vibe!",
       project: "Glass Facade Work",
     }
-    
     // {
     //   id: 5,
     //   name: "Vikram Singh",

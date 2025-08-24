@@ -44,11 +44,11 @@ export function ContactForm() {
       agreeToTerms: false,
     },
   })
-// https://crgqmss1uc.execute-api.us-east-1.amazonaws.com/new_stage/contact
+
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true)
     try {
-      const response = await fetch("https://jk1f1ltl5c.execute-api.us-east-1.amazonaws.com/ok", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

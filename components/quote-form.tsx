@@ -104,8 +104,7 @@ export function QuoteForm() {
         formData.append("files", file)
       })
 
-      // Update the fetch URL to your AWS API Gateway endpoint
-      const response = await fetch("https://crgqmss1uc.execute-api.us-east-1.amazonaws.com/new_stage/quote", {
+      const response = await fetch("/api/quote", {
         method: "POST",
         body: formData,
       })
