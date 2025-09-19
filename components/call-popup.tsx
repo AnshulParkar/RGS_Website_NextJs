@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Phone } from "lucide-react"
 
@@ -15,6 +15,8 @@ export function CallPopup() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-sm text-center">
+        <DialogTitle className="sr-only">Call Now</DialogTitle>
+        <DialogDescription className="sr-only">Contact us for immediate assistance</DialogDescription>
         <div className="flex flex-col items-center gap-4 py-4">
           <Phone className="w-12 h-12 text-blue-600 mb-2" />
           <h2 className="text-xl font-bold">Need Help? Call Us Now!</h2>
