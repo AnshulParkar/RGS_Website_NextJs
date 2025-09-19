@@ -54,3 +54,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+
+export async function GET() {
+  return NextResponse.json(
+    { error: "GET method not allowed. Please use POST to submit the contact form." },
+    { status: 405 }
+  );
+}
