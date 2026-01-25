@@ -38,6 +38,16 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" />
         <meta name="description" content="Professional glass installation, repair, and custom solutions for residential and commercial spaces. Glass Facade, ACP Cladding Work, Glass Work, Glass Railing, Unitized System, and more." />
         <meta name="keywords" content="glass facade, acp cladding work, glass work, glass railing, unitized system, glass partition, glass installation, commercial glass, residential glass, custom glass solutions, roopglass" />
+        {/* Google tag (gtag.js) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7CBBF8YY45"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7CBBF8YY45');
+          `
+        }} />
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
