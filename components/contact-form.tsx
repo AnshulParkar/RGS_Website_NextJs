@@ -48,6 +48,10 @@ export function ContactForm() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true)
     try {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        throw new Error("You are offline. Please check your internet connection and try again.")
+      }
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,12 +66,15 @@ export function ContactForm() {
           description: "We'll get back to you within 24 hours.",
         })
       } else {
-        throw new Error("Failed to send message")
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null
+        throw new Error(payload?.error || "Failed to send message")
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Please try again or contact us directly."
+
       toast({
         title: "Error sending message",
-        description: "Please try again or contact us directly.",
+        description: message,
         variant: "destructive",
       })
     } finally {

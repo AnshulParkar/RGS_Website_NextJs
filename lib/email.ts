@@ -11,8 +11,28 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+function getEmailConfigError(): string | null {
+  const requiredVars = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "FROM_EMAIL"] as const
+  const missingVars = requiredVars.filter((key) => !process.env[key])
+
+  if (missingVars.length > 0) {
+    return `Missing email configuration: ${missingVars.join(", ")}`
+  }
+
+  if (!Number.isFinite(Number(process.env.SMTP_PORT))) {
+    return "SMTP_PORT must be a valid number"
+  }
+
+  return null
+}
+
 // Helper to send email
 async function sendEmail({ to, subject, html, text }: { to: string; subject: string; html: string; text: string }) {
+  const configError = getEmailConfigError()
+  if (configError) {
+    throw new Error(configError)
+  }
+
   await transporter.sendMail({
     from: `"RoopGlass" <${process.env.FROM_EMAIL}>`,
     to,

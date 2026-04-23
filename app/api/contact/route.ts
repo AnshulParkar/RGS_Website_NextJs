@@ -23,9 +23,16 @@ export async function POST(request: NextRequest) {
 
     if (!notificationResult.success) {
       console.error("Failed to send notification email:", notificationResult.error)
+
+      const message = notificationResult.error?.includes("Missing email configuration")
+        ? "Contact form is temporarily unavailable because email is not configured on the server. Please call us directly at +91 9320008279."
+        : "Failed to send notification. Please try again or contact us directly."
+
+      const status = notificationResult.error?.includes("Missing email configuration") ? 503 : 500
+
       return NextResponse.json(
-        { error: "Failed to send notification. Please try again or contact us directly." },
-        { status: 500 },
+        { error: message },
+        { status },
       )
     }
 
@@ -48,6 +55,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid form data", details: error.errors }, { status: 400 })
+    }
+
+    if (error instanceof SyntaxError) {
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 })
     }
 
     console.error("Contact form error:", error)
