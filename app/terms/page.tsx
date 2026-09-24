@@ -44,7 +44,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">Contact</h2>
           <p>
-            For questions about these terms, email roopglass@gmail.com or call +91 9320008279.
+            For questions about these terms, email info.roopglass@gmail.com or call +91 9320008279.
           </p>
         </section>
       </div>

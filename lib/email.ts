@@ -1,10 +1,13 @@
 import nodemailer from "nodemailer"
 
 // SMTP transporter setup
+const port = Number(process.env.SMTP_PORT) || 465
+const isSecure = port === 465
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true, // true for port 465, false for 587
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port,
+  secure: isSecure, // true for port 465, false for 587
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -27,15 +30,28 @@ function getEmailConfigError(): string | null {
 }
 
 // Helper to send email
-async function sendEmail({ to, subject, html, text }: { to: string; subject: string; html: string; text: string }) {
+async function sendEmail({
+  to,
+  subject,
+  html,
+  text,
+  replyTo,
+}: {
+  to: string
+  subject: string
+  html: string
+  text: string
+  replyTo?: string
+}) {
   const configError = getEmailConfigError()
   if (configError) {
     throw new Error(configError)
   }
 
   await transporter.sendMail({
-    from: `"RoopGlass" <${process.env.FROM_EMAIL}>`,
+    from: `"RoopGlass" <${process.env.FROM_EMAIL || "info.roopglass@gmail.com"}>`,
     to,
+    replyTo: replyTo || undefined,
     subject,
     html,
     text,
@@ -78,15 +94,16 @@ interface QuoteData {
   preferredDate?: string
 }
 
-const FROM_EMAIL = process.env.FROM_EMAIL || "info@roopglass.com"
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info@roopglass.com"
-const SALES_EMAIL = process.env.SALES_EMAIL || "info@roopglass.com"
+const FROM_EMAIL = process.env.FROM_EMAIL || "info.roopglass@gmail.com"
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info.roopglass@gmail.com"
+const SALES_EMAIL = process.env.SALES_EMAIL || "info.roopglass@gmail.com"
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://roopglass.com"
 
 export async function sendContactNotification(data: ContactData): Promise<EmailResult> {
   try {
     await sendEmail({
       to: CONTACT_EMAIL,
+      replyTo: data.email,
       subject: `New Contact Form Submission: ${data.subject}`,
       html: generateContactNotificationHTML(data),
       text: generateContactNotificationText(data),
@@ -117,6 +134,7 @@ export async function sendQuoteNotification(data: QuoteData, files: any[], quote
   try {
     await sendEmail({
       to: SALES_EMAIL,
+      replyTo: data.email,
       subject: `${data.urgency === "emergency" ? "🚨 URGENT" : data.urgency === "urgent" ? "⚡ PRIORITY" : ""} New Quote Request: ${quoteId}`,
       html: generateQuoteNotificationHTML(data, files, quoteId),
       text: generateQuoteNotificationText(data, files, quoteId),
@@ -249,7 +267,7 @@ function generateContactConfirmationHTML(firstName: string): string {
           <div class="contact-info">
             <h3>Need immediate assistance?</h3>
             <p><strong>📱 Call us:</strong> +91 9320008279</p>
-            <p><strong>📧 Email:</strong> roopglass@gmail.com</p>
+            <p><strong>📧 Email:</strong> ${CONTACT_EMAIL}</p>
             <p><strong>🕒 Hours:</strong> 24hr</p>
           </div>
           
@@ -445,7 +463,7 @@ function generateQuoteConfirmationHTML(firstName: string, quoteId: string): stri
           <div class="contact-info">
             <h3>Questions or urgent requirements?</h3>
             <p><strong>📱 Call us:</strong> +91 9320008279</p>
-            <p><strong>📧 Email:</strong> info@roopglass.com</p>
+            <p><strong>📧 Email:</strong> ${SALES_EMAIL}</p>
             <p><strong>💬 Reference:</strong> Quote ID ${quoteId}</p>
           </div>
           
@@ -489,7 +507,7 @@ We have received your message and will get back to you within 24 hours.
 
 For immediate assistance:
 Phone: +91 9320008279
-Email: roopglass@gmail.com
+Email: ${CONTACT_EMAIL}
 
 Best regards,
 The RoopGlass Team
@@ -542,7 +560,7 @@ Timeline:
 
 Questions? Contact us:
 Phone: +91 9320008279
-Email: info@roopglass.com
+Email: ${SALES_EMAIL}
 Reference: Quote ID ${quoteId}
 
 Best regards,

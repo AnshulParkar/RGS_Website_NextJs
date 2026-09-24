@@ -1,111 +1,87 @@
-# Email Configuration Setup
+# Email Configuration Setup (Gmail SMTP)
 
-This project can use your Hostinger domain email (via SMTP) for sending transactional emails. Follow these steps to set up email functionality:
+This project uses **Gmail SMTP** with Nodemailer to send and receive transactional emails (contact form inquiries and quote requests) using `info.roopglass@gmail.com`.
 
-## 1. Hostinger SMTP Setup
+---
 
-1. Log in to Hostinger and go to Emails → Email Accounts.
-2. Create or use an existing email (e.g., noreply@yourdomain.com).
-3. Click “Connect Devices” to find your SMTP server, port, username, and password.
-4. Save these credentials for the next step.
+## 1. How to Generate a Google App Password
 
-## 2. Environment Variables
+> [!IMPORTANT]
+> Google does **not** allow regular Gmail account passwords for automated SMTP access. You **must** generate a 16-character **App Password**.
 
-Create a `.env.local` file in your project root and add:
+Follow these exact steps:
 
-\`\`\`env
-# Hostinger SMTP Configuration
-SMTP_HOST=smtp.hostinger.com
+1. **Log in to Google**:
+   Open [Google Account Management](https://myaccount.google.com/) and ensure you are logged into **`info.roopglass@gmail.com`**.
+
+2. **Enable 2-Step Verification** (if not already enabled):
+   - In the left sidebar, click **Security**.
+   - Under the *"How you sign in to Google"* section, click **2-Step Verification** and complete setup with your phone number.
+
+3. **Generate App Password**:
+   - In the top search bar of your Google Account page, type **"App passwords"** and click on it, or navigate directly to:  
+     👉 **https://myaccount.google.com/apppasswords**
+   - Under **App name**, enter: `RoopGlass Website`
+   - Click **Create**.
+   - A modal will show a **16-character password** (e.g. `abcd efgh ijkl mnop`).
+   - Copy this 16-character code.
+
+---
+
+## 2. Environment Variables Configuration
+
+Open your `.env` file in the project root and enter your credentials:
+
+```env
+# Gmail SMTP Configuration
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
-SMTP_USER=infoy@roopglass.com
-SMTP_PASS=Anshul@1832004
+SMTP_USER=info.roopglass@gmail.com
+SMTP_PASS=paste_your_16_character_app_password_here
 
 # Email Configuration
-FROM_EMAIL=info@roopglass.com
-CONTACT_EMAIL=info@roopglass.com
-SALES_EMAIL=info@roopglass.com
+FROM_EMAIL=info.roopglass@gmail.com
+CONTACT_EMAIL=info.roopglass@gmail.com
+SALES_EMAIL=info.roopglass@gmail.com
 
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://www.roopglass.com
-\`\`\`
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-## 3. Update Email Sending Logic
+> [!NOTE]
+> When deploying to production (e.g. Vercel, Netlify, VPS), remember to add these exact same environment variables to your deployment provider's dashboard and set `NEXT_PUBLIC_SITE_URL` to `https://www.roopglass.com`.
 
-1. Install Nodemailer:
-   ```sh
-   pnpm add nodemailer
-   ```
-2. Update the `sendEmail` function in `lib/email.ts` to use Nodemailer with your Hostinger SMTP credentials. Example:
-   ```js
-   import nodemailer from "nodemailer";
+---
 
-   const transporter = nodemailer.createTransport({
-     host: process.env.SMTP_HOST,
-     port: Number(process.env.SMTP_PORT),
-     secure: true, // true for port 465, false for 587
-     auth: {
-       user: process.env.SMTP_USER,
-       pass: process.env.SMTP_PASS,
-     },
-   });
+## 3. Verify and Test Email Setup
 
-   export async function sendEmail({ to, subject, html }) {
-     await transporter.sendMail({
-       from: `"Your Name" <${process.env.FROM_EMAIL}>`,
-       to,
-       subject,
-       html,
-     });
-   }
-   ```
+You can verify your email configuration directly from your terminal without opening a browser:
 
-## 4. Domain Verification (Recommended)
+```sh
+node scripts/test-email.mjs
+```
 
-For best deliverability, ensure your domain's DNS records (SPF, DKIM) are set up in Hostinger. See Hostinger's email documentation for details.
+If configured correctly, you will receive a test email in `info.roopglass@gmail.com` confirming that SMTP authentication succeeded.
 
-## 5. Email Templates
+---
 
-The system includes professionally designed HTML email templates for:
+## 4. How Email Routing Works
 
-- **Contact Form Notifications**: Sent to your business email when someone submits the contact form
-- **Contact Confirmations**: Sent to customers confirming their message was received
-- **Quote Request Notifications**: Sent to sales team with detailed quote information
-- **Quote Confirmations**: Sent to customers confirming their quote request
+- **Contact Form**:
+  - Notification sent to: `CONTACT_EMAIL` (`info.roopglass@gmail.com`)
+  - Confirmation sent to: Customer's submitted email
+  - `replyTo` header is set to customer's email, so clicking **Reply** in Gmail directly replies to the customer!
+- **Quote Form**:
+  - Notification sent to: `SALES_EMAIL` (`info.roopglass@gmail.com`)
+  - Confirmation sent to: Customer's submitted email
+  - Urgent/Emergency badges applied to email subjects
 
-## 6. Testing
+---
 
-For development, you can:
+## 5. Troubleshooting Common Gmail Issues
 
-1. Use a test email account
-2. Set up email forwarding to your personal email
-3. Check the console logs for email content if needed
-
-## 7. Features
-
-✅ **Professional HTML Templates**: Modern, responsive email designs
-✅ **Automatic Notifications**: Business receives immediate notifications
-✅ **Customer Confirmations**: Customers get instant confirmation emails
-✅ **Priority Handling**: Emergency quotes get special formatting
-✅ **File Attachment Support**: Support for uploaded sketches and documents
-✅ **Error Handling**: Graceful fallback when email services are unavailable
-✅ **Mobile Responsive**: Emails look great on all devices
-
-## 8. Customization
-
-To customize email templates:
-
-1. Edit the HTML templates in `lib/email.ts`
-2. Modify the email content, styling, and structure
-3. Update company information and branding
-4. Add additional email types as needed
-
-## 9. Alternative Email Services
-
-If you prefer a different email service, you can easily swap out Hostinger SMTP for:
-
-- **SendGrid**: API-based, popular for transactional email
-- **Mailgun**: Popular alternative with similar API
-- **AWS SES**: Cost-effective for high volume
-- **Postmark**: Great for transactional emails
-
-Simply update the `sendEmail` function in `lib/email.ts` to use your preferred service.
+| Issue / Error | Cause | Solution |
+|---|---|---|
+| `Invalid login: 535-5.7.8 Username and Password not accepted` | Using standard account password instead of App Password, or typo in email | Ensure 2-Step Verification is ON and use the 16-character App Password generated from `myaccount.google.com/apppasswords`. |
+| `ETIMEDOUT` or connection hanging | Port blocked by network or ISP | Ensure `SMTP_PORT=465` (SSL) or try `SMTP_PORT=587` (TLS). |
+| Emails landing in Spam | Google / recipient spam filtering | Sending from the authenticated address (`info.roopglass@gmail.com`) as `FROM_EMAIL` resolves reputation mismatches. |

@@ -102,7 +102,7 @@ export default function ContactPage() {
                   <Mail className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Email</h3>
-                <p className="text-slate-600 dark:text-slate-400">roopglass@gmail.com</p>
+                <p className="text-slate-600 dark:text-slate-400">info.roopglass@gmail.com</p>
                 <p className="text-sm text-slate-500 dark:text-slate-500">Response within 24 hours</p>
               </CardContent>
             </Card>
