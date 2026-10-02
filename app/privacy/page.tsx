@@ -46,7 +46,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">Contact</h2>
           <p>
-            For privacy-related questions, contact us at roopglass@gmail.com or call +91 9320008279.
+            For privacy-related questions, contact us at info.roopglass@gmail.com or call +91 9320008279.
           </p>
         </section>
       </div>
