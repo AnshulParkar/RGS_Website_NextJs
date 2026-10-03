@@ -1,0 +1,10 @@
+"use client"
+import { useMemo, useState } from "react"
+import Link from "next/link"
+import type { Category, Project } from "@/lib/content"
+
+export function ProjectBrowser({ categories, projects }: { categories: Category[]; projects: Project[] }) {
+  const [category, setCategory] = useState("all"); const [term, setTerm] = useState("")
+  const visible = useMemo(() => projects.filter((project) => (category === "all" || project.categorySlug === category) && `${project.name} ${project.location} ${project.excerpt}`.toLowerCase().includes(term.toLowerCase())), [category, term, projects])
+  return <><div className="flex flex-col md:flex-row gap-4 justify-between mb-8"><input className="rounded-md border px-4 py-2 bg-white dark:bg-slate-900" value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search by project or location" /><div className="flex gap-2 flex-wrap">{[{ slug: "all", name: "All commercial work" }, ...categories].map((item) => <button key={item.slug} onClick={() => setCategory(item.slug)} className={`px-3 py-2 text-sm rounded-full border ${category === item.slug ? "bg-blue-600 text-white border-blue-600" : "bg-white dark:bg-slate-900"}`}>{item.name}</button>)}</div></div><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">{visible.map((project) => <Link href={`/projects/${project.slug}`} key={project.id} className="group rounded-xl overflow-hidden border bg-white dark:bg-slate-900 hover:shadow-lg transition-shadow"><img src={project.imageUrl || "/placeholder.jpg"} alt={project.name} className="w-full h-52 object-cover" /><div className="p-5"><p className="text-sm text-blue-600">{project.location}</p><h2 className="text-xl font-semibold mt-1 group-hover:text-blue-600">{project.name}</h2><p className="text-slate-600 dark:text-slate-300 mt-2 text-sm">{project.excerpt}</p><span className="inline-block mt-4 text-sm font-medium text-blue-600">Read case study →</span></div></Link>)}</div>{visible.length === 0 && <p className="py-12 text-center text-slate-500">No projects match that search.</p>}</>
+}

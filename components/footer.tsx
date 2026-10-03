@@ -1,167 +1,96 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Facebook, Twitter, Instagram, Linkedin, Phone, Mail, MapPin, Clock } from "lucide-react"
+import { Clock, ExternalLink, Mail, MapPin, Phone } from "lucide-react"
+import { company, fullAddress, profiles } from "@/lib/company"
+
+const serviceLinks = [
+  { href: "/catalog/structural-glazing", label: "Structural glazing" },
+  { href: "/catalog/curtain-wall-system", label: "Curtain wall systems" },
+  { href: "/catalog/acp-aluminium-cladding", label: "ACP & aluminium cladding" },
+  { href: "/catalog/glass-railing", label: "Glass railings" },
+  { href: "/roofing", label: "Roofing systems" },
+  { href: "/catalog/polycarbonate-domes-skylights", label: "Polycarbonate domes & skylights" },
+  { href: "/slimline-partitions", label: "Slimline glass partitions" },
+]
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">RG</span>
-              </div>
-              <span className="text-xl font-bold">RoopGlass</span>
+    <footer className="bg-slate-950 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        {/* Brand */}
+        <div>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="relative w-9 h-9 flex items-center justify-center">
+              <img src="/favicon.png" alt="Roop Glass Solutions logo" className="w-full h-full object-contain" />
             </div>
-            <p className="text-slate-300 mb-6">
-              Premium glass solutions for residential and commercial spaces. Transforming visions into reality with
-              expert craftsmanship and innovative designs.
-            </p>
-            <div className="flex space-x-4">
-              <Button size="icon" variant="ghost" className="hover:bg-blue-600">
-                <Facebook className="w-5 h-5" />
-              </Button>
-              <Button size="icon" variant="ghost" className="hover:bg-blue-600">
-                <Twitter className="w-5 h-5" />
-              </Button>
-              <Button size="icon" variant="ghost" className="hover:bg-blue-600">
-                <Instagram className="w-5 h-5" />
-              </Button>
-              <Button size="icon" variant="ghost" className="hover:bg-blue-600">
-                <Linkedin className="w-5 h-5" />
-              </Button>
-            </div>
+            <span className="font-bold text-lg tracking-tight">{company.name}</span>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/" className="text-slate-300 hover:text-white transition-colors">
-                  Home
-                </Link>
+          <p className="text-slate-400 leading-relaxed text-sm">
+            Architectural glazing, facade, cladding and roofing contractor in Mumbai — {company.yearsExperience} years across Maharashtra, {company.clientsServed} corporate, public sector and institutional clients. Proprietor: {company.proprietor}.
+          </p>
+          <h2 className="mt-6 mb-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Find us on</h2>
+          <ul className="flex flex-wrap gap-2">
+            {profiles.map((profile) => (
+              <li key={profile.name}>
+                <a href={profile.url} target="_blank" rel="noopener" title={profile.label} className="inline-flex items-center gap-1 rounded-full border border-slate-800 px-3 py-1 text-xs text-slate-300 hover:border-blue-500 hover:text-white transition-colors">
+                  {profile.name} <ExternalLink className="h-3 w-3" />
+                </a>
               </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/portfolio" className="text-slate-300 hover:text-white transition-colors">
-                  Portfolio
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-slate-300 hover:text-white transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Services</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Glass Facade
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Glass Railing
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Glass Partition
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  ACP Panel
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Glass Roofing
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-slate-300 hover:text-white transition-colors">
-                  Glass Installation
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Contact Info</h3>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-slate-300">A1 Business Center, 2nd Floor, Sundar Kapoor Compound,</p>
-                  <p className="text-slate-300">Opp Thakur Mall, Dahisar Check Nakka, Mumbai-401107.</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <p className="text-slate-300">+91 9320008279</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <p className="text-slate-300">info.roopglass@gmail.com</p>
-              </div>
-              <div className="flex items-start space-x-3">
-                <Clock className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="text-slate-300">24/7 Support</p>
-                </div>
-              </div>
-            </div>
-          </div>
+            ))}
+          </ul>
         </div>
 
-        {/* Newsletter */}
-        <div className="border-t border-slate-700 mt-12 pt-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Stay Updated</h3>
-              <p className="text-slate-300">Subscribe to our newsletter for latest updates and offers.</p>
-            </div>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter your email"
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
-              />
-              <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Services */}
+        <nav aria-label="Services">
+          <h2 className="font-semibold mb-4 text-sm uppercase tracking-wider text-slate-300">Services</h2>
+          <ul className="grid gap-2.5">
+            {serviceLinks.map((link) => (
+              <li key={link.href}><Link href={link.href} className="text-slate-400 hover:text-white transition-colors">{link.label}</Link></li>
+            ))}
+          </ul>
+        </nav>
 
-        {/* Bottom */}
-        <div className="border-t border-slate-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-slate-400 text-sm">© 2025 RoopGlassSolution. All rights reserved.</p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-slate-400 hover:text-white text-sm transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-slate-400 hover:text-white text-sm transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/sitemap" className="text-slate-400 hover:text-white text-sm transition-colors">
-              Sitemap
-            </Link>
+        {/* Navigation */}
+        <nav aria-label="Company">
+          <h2 className="font-semibold mb-4 text-sm uppercase tracking-wider text-slate-300">Company</h2>
+          <ul className="grid gap-2.5">
+            <li><Link href="/about" className="text-slate-400 hover:text-white transition-colors">About us</Link></li>
+            <li><Link href="/catalog" className="text-slate-400 hover:text-white transition-colors">Services catalog</Link></li>
+            <li><Link href="/projects" className="text-slate-400 hover:text-white transition-colors">Completed projects</Link></li>
+            <li><Link href="/projects/association-for-research-in-homoeopathy-airoli" className="text-slate-400 hover:text-white transition-colors">ARH Airoli project</Link></li>
+            <li><Link href="/insights" className="text-slate-400 hover:text-white transition-colors">Insights</Link></li>
+            <li><Link href="/contact" className="text-slate-400 hover:text-white transition-colors">Contact us</Link></li>
+          </ul>
+        </nav>
+
+        {/* Contact info (NAP — keep identical to listings) */}
+        <address className="not-italic space-y-3.5">
+          <h2 className="font-semibold mb-4 text-sm uppercase tracking-wider text-slate-300">Contact</h2>
+          <div className="flex gap-3 text-slate-400">
+            <Phone className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
+            <a href={`tel:${company.phoneE164}`} className="hover:text-white transition-colors">{company.phone}</a>
           </div>
+          <div className="flex gap-3 text-slate-400">
+            <Mail className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
+            <a href={`mailto:${company.email}`} className="hover:text-white transition-colors break-all">{company.email}</a>
+          </div>
+          <div className="flex gap-3 text-slate-400">
+            <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
+            <p>{fullAddress}</p>
+          </div>
+          <div className="flex gap-3 text-slate-400">
+            <Clock className="w-4 h-4 shrink-0 mt-0.5 text-blue-400" />
+            <p>{company.hoursText}</p>
+          </div>
+        </address>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 border-t border-slate-800 flex flex-wrap gap-4 justify-between text-sm text-slate-500">
+        <p>© {new Date().getFullYear()} {company.name}. All rights reserved.</p>
+        <div className="flex gap-5">
+          <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+          <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+          <Link href="/sitemap" className="hover:text-slate-300 transition-colors">Sitemap</Link>
         </div>
       </div>
     </footer>

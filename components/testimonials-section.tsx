@@ -1,160 +1,126 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
+import Link from "next/link"
+import { Star, Quote, ChevronLeft, ChevronRight, PenLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { LightDecor } from "@/components/light-decor"
+import type { Testimonial } from "@/lib/content"
 
-const testimonials = 
-  [
-    {
-      id: 1,
-      name: "Architect Mr. Garg",
-      role: "Architect",
-      location: "Navi Mumbai",
-      avatar: "/placeholder.svg?height=60&width=60",
-      rating: 5,
-      text: "RoopGlass successfully executed ACP facade and glass work for our Navi Mumbai Maha Nagar Palika projects. Highly professional and reliable!",
-      project: "ACP Facade & Glass Work",
-    },
-    {
-      id: 2,
-      name: "R.K. Agrawal",
-      role: "Admin Head",
-      location: "Gorai, Mumbai",
-      avatar: "/placeholder.svg?height=60&width=60",
-      rating: 5,
-      text: "RoopGlass delivered exceptional interior glass work for the Global Pagoda Vipassana Gallery. Truly enhanced the spiritual ambiance of the space.",
-      project: "Tourist Attraction & Meditation Center",
-    },
-    {
-      id: 3,
-      name: "Mr. Uday Metkar – Delta Tect Engineering",
-      role: "Admin Head",
-      location: "Mumbai",
-      avatar: "/placeholder.svg?height=60&width=60",
-      rating: 5,
-      text: "Glass facade work for high-rise buildings is challenging, but RoopGlass handled it with precision and expertise. The quality and finish exceeded expectations.",
-      project: "Glass Facade",
-    },
-    {
-      id: 4,
-      name: "Dilip Mewada & Associates",
-      role: "Owner",
-      location: "Mumbai",
-      avatar: "/placeholder.svg?height=60&width=60",
-      rating: 5,
-      text: "The glass partitions installed by RoopGlass gave our restaurant a modern, open, and welcoming atmosphere. Our customers love the new vibe!",
-      project: "Glass Facade Work",
-    }
-    // {
-    //   id: 5,
-    //   name: "Vikram Singh",
-    //   role: "Architect",
-    //   location: "Mumbai",
-    //   avatar: "/placeholder.svg?height=60&width=60",
-    //   rating: 5,
-    //   text: "RoopGlass brings architectural visions to life with precision. Their innovative glass solutions and technical expertise make them an invaluable partner in our projects.",
-    //   project: "Luxury Villa Design",
-    // },
-]
-
-export function TestimonialsSection() {
+export function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const ref = useRef<HTMLElement>(null)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-    }, 5000)
-    return () => clearInterval(timer)
+    if (!ref.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect() } },
+      { threshold: 0.1 }
+    )
+    observer.observe(ref.current)
+    return () => observer.disconnect()
   }, [])
 
-  const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-  }
+  useEffect(() => {
+    if (testimonials.length < 2) return
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [testimonials.length])
 
-  const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-  }
-
-  const currentTestimonial = testimonials[currentIndex]
+  if (testimonials.length === 0) return null
+  const current = testimonials[currentIndex % testimonials.length]
+  const subtitle = [current.role, current.location].filter(Boolean).join(" · ")
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent">
-              What Our Clients Say
-            </span>
+    <section ref={ref} id="testimonials" className="py-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden scroll-mt-16">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/70 via-white/60 to-sky-50/70 dark:bg-none dark:bg-slate-950" />
+      <LightDecor grid={false} shards />
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-blue-500/[0.02] rounded-full blur-3xl" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className={cn(
+          "text-center mb-16 transition-all duration-700",
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )}>
+          <div className="light-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tracking-wide uppercase">Testimonials</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            What Our <span className="text-brand-gradient">Clients Say</span>
           </h2>
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-            Don't just take our word for it - hear from our satisfied customers
+          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mt-4">
+            Feedback from architects, contractors and building owners we have worked with.
           </p>
         </div>
 
-        <div className="relative max-w-4xl mx-auto">
-          {/* Main testimonial */}
-          <Card className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-white/30 shadow-xl">
+        {/* Main testimonial card */}
+        <div className={cn(
+          "relative max-w-3xl mx-auto transition-all duration-700 delay-200",
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        )}>
+          <Card className="light-gradient-border bg-white dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800/60 shadow-xl shadow-blue-500/[0.03]">
             <CardContent className="p-8 md:p-12">
-              <div className="flex items-center justify-center mb-8">
-                <Quote className="w-12 h-12 text-blue-500 opacity-50" />
-              </div>
+              <Quote className="w-10 h-10 text-blue-500/20 mb-6" />
 
-              <blockquote className="text-lg md:text-xl text-center text-slate-700 dark:text-slate-300 mb-8 leading-relaxed">
-                "{currentTestimonial.text}"
+              <blockquote className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 mb-8 leading-relaxed font-medium">
+                &ldquo;{current.quote}&rdquo;
               </blockquote>
 
-              <div className="flex items-center justify-center mb-6">
-                {[...Array(currentTestimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-500 fill-current" />
+              <div className="flex items-center mb-6 gap-1" aria-label={`Rated ${current.rating} out of 5`}>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className={cn("w-4 h-4", i < current.rating ? "text-amber-400 fill-current" : "text-slate-300 dark:text-slate-600")} />
                 ))}
               </div>
 
-              <div className="flex items-center justify-center space-x-4">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src={currentTestimonial.avatar || "/placeholder.svg"} alt={currentTestimonial.name} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
-                    {currentTestimonial.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="text-center">
-                  <h4 className="font-semibold text-slate-900 dark:text-white">{currentTestimonial.name}</h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {currentTestimonial.role} • {currentTestimonial.location}
-                  </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{currentTestimonial.project}</p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                  {current.name.charAt(0)}
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white">{current.name}</h4>
+                  {subtitle && (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+                  )}
+                  {current.project && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-0.5">{current.project}</p>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center mt-8 space-x-4">
+          {testimonials.length > 1 && (
+          <div className="flex items-center justify-center mt-8 gap-4">
             <Button
               variant="outline"
               size="icon"
-              onClick={prevTestimonial}
-              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-white/30 hover:bg-white/80 dark:hover:bg-slate-800/80"
+              onClick={() => setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
+              className="border-slate-200 dark:border-slate-700 hover:border-blue-500 rounded-xl"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
 
-            <div className="flex space-x-2">
+            <div className="flex gap-2">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
                   aria-label={`Go to testimonial ${index + 1}`}
-                  className={`h-3 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-500",
                     index === currentIndex
-                      ? "bg-blue-500 w-8 shadow-md"
-                      : "bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500 w-3"
-                  }`}
+                      ? "bg-blue-500 w-8"
+                      : "bg-slate-200 dark:bg-slate-700 w-2 hover:bg-slate-300"
+                  )}
                 />
               ))}
             </div>
@@ -162,48 +128,23 @@ export function TestimonialsSection() {
             <Button
               variant="outline"
               size="icon"
-              onClick={nextTestimonial}
-              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border-white/30 hover:bg-white/80 dark:hover:bg-slate-800/80"
+              onClick={() => setCurrentIndex((prev) => (prev + 1) % testimonials.length)}
+              className="border-slate-200 dark:border-slate-700 hover:border-blue-500 rounded-xl"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-        </div>
+          )}
 
-        {/* All testimonials grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
-          {testimonials.slice(0, 3).map((testimonial) => (
-            <Card
-              key={testimonial.id}
-              className="bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm border border-white/20 hover:bg-white/60 dark:hover:bg-slate-800/60 transition-all duration-300"
+          <div className="mt-8 text-center">
+            <Link
+              href="/review"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-500 fill-current" />
-                  ))}
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-                  "{testimonial.text.substring(0, 120)}..."
-                </p>
-                <div className="flex items-center space-x-3">
-                  <Avatar className="w-10 h-10">
-                    <AvatarImage src={testimonial.avatar || "/placeholder.svg"} alt={testimonial.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm">
-                      {testimonial.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h5 className="font-medium text-slate-900 dark:text-white text-sm">{testimonial.name}</h5>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{testimonial.role}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              <PenLine className="w-4 h-4" />
+              Worked with us? Share your experience
+            </Link>
+          </div>
         </div>
       </div>
     </section>

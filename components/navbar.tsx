@@ -1,118 +1,103 @@
 "use client"
-
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { Menu, Phone, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Menu, X, Phone } from "lucide-react"
 import { cn } from "@/lib/utils"
-import logo from "@/public/logo.png"
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/catalog", label: "Services" },
+  { href: "/projects", label: "Projects" },
+  { href: "/about", label: "About" },
+  { href: "/insights", label: "Insights" },
+  { href: "/contact", label: "Contact" },
+]
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const handler = () => setScrolled(window.scrollY > 16)
+    window.addEventListener("scroll", handler)
+    return () => window.removeEventListener("scroll", handler)
   }, [])
 
-  const navItems = [
-    { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/contact", label: "Contact" },
-  ]
-
   return (
-    <nav
-      className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300",
-        isScrolled
-          ? "backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-white/20 shadow-lg"
-          : "bg-transparent",
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className={cn(
+      "fixed top-0 w-full z-50 transition-all duration-300",
+      scrolled
+        ? "bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg border-b border-slate-200/80 dark:border-slate-800/80 shadow-sm"
+        : "bg-white/60 dark:bg-slate-950/60 backdrop-blur-md"
+    )}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="h-16 flex items-center justify-between">
           {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-            <img
-              src={logo.src}
-              alt="Roop Glass Solutions Logo"
-              className="w-12 h-11 object-contain"
-            />
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 flex items-center justify-center transition-transform group-hover:scale-105">
+              <img src="/favicon.png" alt="Roop Glass Solutions Logo" className="w-full h-full object-contain" />
+            </div>
+            <span className="font-bold text-slate-900 dark:text-white tracking-tight">
               Roop Glass Solutions
             </span>
-            </Link>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+          {/* Desktop links */}
+          <div className="hidden lg:flex gap-1">
+            {links.map((link) => (
               <Link
-                key={item.href}
-                href={item.href}
-                className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+                key={link.href}
+                href={link.href}
+                className="px-3 xl:px-3.5 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-all"
               >
-                {item.label}
+                {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Right side */}
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
-              <Phone className="w-4 h-4" />
-              <span>+91 9320008279</span>
-            </div>
-            <ThemeToggle />
-            <Button
-              asChild
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+          {/* Desktop right side */}
+          <div className="hidden lg:flex items-center gap-3">
+            <a
+              className="hidden xl:flex text-sm items-center gap-1.5 text-slate-500 hover:text-blue-600 transition-colors font-medium"
+              href="tel:+919320008279"
             >
-              <Link href="/contact?tab=quote">Get Quote</Link>
+              <Phone className="w-3.5 h-3.5" />
+              +91 9320008279
+            </a>
+            <ThemeToggle />
+            <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg shadow-md shadow-blue-500/20">
+              <Link href="/contact">Contact us</Link>
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          {/* Mobile menu toggle */}
+          <div className="flex lg:hidden items-center gap-2">
             <ThemeToggle />
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <Button variant="ghost" size="icon" onClick={() => setOpen(!open)} aria-label="Toggle navigation" className="rounded-lg">
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-white/20 shadow-lg">
-            <div className="px-4 py-6 space-y-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="block text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
-                  <Phone className="w-4 h-4" />
-                  <span>+91 9320008279</span>
-                </div>
-                <Button
-                  asChild
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-                >
-                  <Link href="/contact?tab=quote">Get Quote</Link>
-                </Button>
-              </div>
+        {/* Mobile menu */}
+        {open && (
+          <div className="lg:hidden py-5 border-t border-slate-200 dark:border-slate-800 space-y-1 animate-fadeInUp" style={{ animationDuration: "0.3s" }}>
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="pt-3">
+              <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg">
+                <Link href="/contact" onClick={() => setOpen(false)}>Contact us</Link>
+              </Button>
             </div>
           </div>
         )}

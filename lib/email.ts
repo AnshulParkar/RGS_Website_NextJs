@@ -97,7 +97,7 @@ interface QuoteData {
 const FROM_EMAIL = process.env.FROM_EMAIL || "info.roopglass@gmail.com"
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info.roopglass@gmail.com"
 const SALES_EMAIL = process.env.SALES_EMAIL || "info.roopglass@gmail.com"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://roopglass.com"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.split("||")[0].trim() || "https://roopglass.com"
 
 export async function sendContactNotification(data: ContactData): Promise<EmailResult> {
   try {
@@ -566,4 +566,41 @@ Reference: Quote ID ${quoteId}
 Best regards,
 The RoopGlass Sales Team
   `
+}
+
+interface TestimonialData {
+  name: string
+  role: string
+  location: string
+  project: string
+  quote: string
+  rating: number
+  email: string
+  published: boolean
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;")
+}
+
+export async function sendTestimonialNotification(data: TestimonialData): Promise<EmailResult> {
+  const status = data.published ? "It is now live on the website." : "It is waiting for approval in the admin (Testimonials tab)."
+  const details: [string, string][] = [
+    ["Name", data.name], ["Role", data.role], ["Location", data.location], ["Project", data.project],
+    ["Rating", `${data.rating} / 5`], ["Email", data.email],
+  ]
+  const rows = details.filter(([, value]) => value).map(([label, value]) => `<tr><td style="padding:4px 12px 4px 0;color:#64748b">${label}</td><td style="padding:4px 0">${escapeHtml(value)}</td></tr>`).join("")
+  try {
+    await sendEmail({
+      to: CONTACT_EMAIL,
+      replyTo: data.email || undefined,
+      subject: `New testimonial from ${data.name} (${data.rating}/5)`,
+      html: `<div style="font-family:Arial,sans-serif;font-size:14px;color:#0f172a"><h2 style="margin:0 0 12px">New testimonial submitted</h2><p>${status}</p><table>${rows}</table><blockquote style="margin:16px 0;padding:12px 16px;border-left:4px solid #3b82f6;background:#f8fafc">${escapeHtml(data.quote).replace(/\n/g, "<br>")}</blockquote><p><a href="${SITE_URL}/admin/dashboard">Manage testimonials</a></p></div>`,
+      text: `New testimonial submitted. ${status}\n\n${details.filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`).join("\n")}\n\n"${data.quote}"\n\nManage testimonials: ${SITE_URL}/admin/dashboard`,
+    })
+    return { success: true }
+  } catch (error) {
+    console.error("Error sending testimonial notification:", error)
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
+  }
 }

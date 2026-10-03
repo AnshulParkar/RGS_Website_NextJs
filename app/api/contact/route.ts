@@ -1,74 +1,30 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { sendContactNotification, sendContactConfirmation } from "@/lib/email"
+import { sendContactConfirmation, sendContactNotification } from "@/lib/email"
+import { contentStore } from "@/lib/supabase"
 
-const contactSchema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().min(10),
-  subject: z.string().min(5),
-  message: z.string().min(10),
-  preferredContact: z.enum(["email", "phone", "both"]),
-  agreeToTerms: z.boolean(),
+const inquirySchema = z.object({
+  name: z.string().trim().min(2).max(100), company: z.string().trim().max(120).optional(),
+  email: z.string().trim().email().optional().or(z.literal("")), phone: z.string().trim().min(10).max(20),
+  projectLocation: z.string().trim().max(150).optional(), serviceInterest: z.string().trim().min(1).max(100),
+  message: z.string().trim().min(10).max(4000), preferredContact: z.enum(["phone", "email", "either"]),
+  agreeToTerms: z.literal(true), website: z.string().max(0).optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const validatedData = contactSchema.parse(body)
-
-    // Send notification email to business
-    const notificationResult = await sendContactNotification(validatedData)
-
-    if (!notificationResult.success) {
-      console.error("Failed to send notification email:", notificationResult.error)
-
-      const message = notificationResult.error?.includes("Missing email configuration")
-        ? "Contact form is temporarily unavailable because email is not configured on the server. Please call us directly at +91 9320008279."
-        : "Failed to send notification. Please try again or contact us directly."
-
-      const status = notificationResult.error?.includes("Missing email configuration") ? 503 : 500
-
-      return NextResponse.json(
-        { error: message },
-        { status },
-      )
-    }
-
-    // Send confirmation email to customer
-    const confirmationResult = await sendContactConfirmation(validatedData.email, validatedData.firstName)
-
-    if (!confirmationResult.success) {
-      console.warn("Failed to send confirmation email:", confirmationResult.error)
-      // Don't fail the request if confirmation email fails
-    }
-
-    return NextResponse.json(
-      {
-        message: "Contact form submitted successfully",
-        notificationSent: notificationResult.success,
-        confirmationSent: confirmationResult.success,
-      },
-      { status: 200 },
-    )
+    const inquiry = inquirySchema.parse(await request.json())
+    if (inquiry.website) return NextResponse.json({ message: "Inquiry received" })
+    const [firstName, ...rest] = inquiry.name.split(/\s+/)
+    const emailData = { firstName, lastName: rest.join(" ") || "Customer", email: inquiry.email || "no-email@submitted.invalid", phone: inquiry.phone, subject: inquiry.serviceInterest, message: `${inquiry.projectLocation ? `Project location: ${inquiry.projectLocation}\n\n` : ""}${inquiry.message}`, preferredContact: inquiry.preferredContact }
+    if (contentStore.configured) await contentStore.adminCreate("inquiries", { name: inquiry.name, company: inquiry.company || null, email: inquiry.email || null, phone: inquiry.phone, project_location: inquiry.projectLocation || null, service_interest: inquiry.serviceInterest, message: inquiry.message, preferred_contact: inquiry.preferredContact, status: "new" })
+    const notification = await sendContactNotification(emailData)
+    if (!notification.success && !contentStore.configured) return NextResponse.json({ error: "The inquiry service is temporarily unavailable. Please call us directly." }, { status: 503 })
+    if (inquiry.email) void sendContactConfirmation(inquiry.email, firstName)
+    return NextResponse.json({ message: "Inquiry received" }, { status: 200 })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Invalid form data", details: error.errors }, { status: 400 })
-    }
-
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 })
-    }
-
-    console.error("Contact form error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    if (error instanceof z.ZodError) return NextResponse.json({ error: "Please check the inquiry details and try again." }, { status: 400 })
+    console.error("Inquiry form error", error)
+    return NextResponse.json({ error: "Unable to send your inquiry. Please try again." }, { status: 500 })
   }
-}
-
-export async function GET() {
-  return NextResponse.json(
-    { error: "GET method not allowed. Please use POST to submit the contact form." },
-    { status: 405 }
-  );
 }

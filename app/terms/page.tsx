@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | RoopGlass",
-  description: "Terms and conditions for using RoopGlass services and website.",
+  title: "Terms and Conditions",
+  alternates: { canonical: "/terms" },
+  description: "Terms and conditions for using Roop Glass Solutions services and website.",
 }
 
 export default function TermsPage() {

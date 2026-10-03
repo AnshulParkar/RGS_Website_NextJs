@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | RoopGlass",
-  description: "Privacy policy for RoopGlass website and customer inquiries.",
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
+  description: "Privacy policy for the Roop Glass Solutions website and customer inquiries.",
 }
 
 export default function PrivacyPage() {
