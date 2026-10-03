@@ -8,6 +8,7 @@ import { CallPopup } from "@/components/call-popup"
 import { company, siteUrl } from "@/lib/company"
 import { jsonLd, siteGraph } from "@/lib/schema"
 import Script from "next/script"
+import { Analytics } from "@vercel/analytics/next"
 
 // Google Analytics 4 (restored from the committed layout). Override or disable with NEXT_PUBLIC_GA_ID ("" disables).
 const gaId = process.env.NEXT_PUBLIC_GA_ID ?? "G-7CBBF8YY45"
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
           </div>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
